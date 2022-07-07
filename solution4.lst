@@ -1,0 +1,132 @@
+> db.createCollection("company",
+...                     { "validator":{$jsonSchema:
+...         {"bsonType":"object",
+...         "properties":{"_id":{"bsonType":"string"},
+...                     "DEPARTMENT":{"bsonType":"object",
+...                                 "properties":{"DName":{"bsonType":"string"},
+...                                                 "manager":{"bsonType":"string"},
+...                                                 "msdate":{"bsonType":"date"},
+...                                                 "Owns":{"bsonType":"array",
+...                                                         "items":{"bsonType":"object",
+...                                                                     "properties":{"EMPLOYEE":{"bsonType":"object",
+...                                                                                     "properties":{"emp_num":{"bsonType":"int"},
+...                                                                                                     "name":{"bsonType":"string"},
+...                                                                                                     "dob":{"bsonType":"date"},
+...                                                                                                     "supervisor":{"bsonType":"int"}
+...                                                                                                     },
+... 
+...                                                                                     "required":["emp_num","name","dob"],
+...                                                                                     "additionalProperties":false} },
+...                                                                     "required":["EMPLOYEE"],
+...                                                                     "additionalProperties":false} },
+... 
+...                                                 "has":{"bsonType":"array",
+...                                                         "items":{"bsonType":"object",
+...                                                                     "properties":{"deptLocation":{"bsonType":"object",
+...                                                                                     "properties":{
+...                                                                                                     "address":{"bsonType":"string"}
+... 
+...                                                 },
+... 
+...                                                                                 "required":["address"],
+...                                                                                 "additionalProperties":false} },
+...                                                                     "required":["deptLocation"],
+
+...                                                                     "additionalProperties":false} }
+...                                                 },
+...                                                 "required":["DName","manager","msdate","Owns","has"],
+...                                                 "additionalProperties":false} },
+...         "required":["_id","DEPARTMENT"],
+...         "additionalProperties":false
+...         } } } );
+{ "ok" : 1 }
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> db.company.insert({"_id":"EngineeringDept",
+...         "DEPARTMENT":{"DName":"Engineering",
+...                         "manager":"Mehrin",
+...                         "msdate":ISODate("2019-06-23T11:03:11.704Z"),
+...                         "Owns":[ {"EMPLOYEE":{"emp_num":NumberInt("11111"),
+...                                                 "name":"Fatima",
+...                                                 "dob":ISODate("1999-06-23T11:03:11.704Z")
+...         } },
+...                                 {"EMPLOYEE":{"emp_num":NumberInt("22222"),
+...                                             "name":"Mosammat",
+...                                             "dob":ISODate("1989-06-23T11:03:11.704Z"),
+...                                             "supervisor":NumberInt("11111")
+...         } }
+...         ],
+...                         "has":[ {"deptLocation":{
+...                                                 "address":"CBD NSW"
+... 
+...                         } },
+...                                 {"deptLocation":{
+...                                 "address":"Baker Street"
+...                                 } }
+...                         ]
+... 
+...         }
+...         } );
+WriteResult({ "nInserted" : 1 })
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+> db.company.insert({"_id":"EngineeringDeptFail",
+...         "DEPARTMENT":{"DName":"Maths",
+...                         "manager":"Mehrin",
+...                         "msdate":ISODate("2019-06-23T11:03:11.704Z"),
+...                         "Owns":[ {"EMPLOYEE":{"emp_num":NumberInt("11111"),
+...                                                 "name":"Fatima",
+...                                                 "dob":ISODate("1999-06-23T11:03:11.704Z")
+...         } },
+...                                 {"EMPLOYEE":{"emp_num":"employee number in string",
+...                                             "name":"Mosammat",
+...                                             "dob":ISODate("1989-06-23T11:03:11.704Z"),
+...                                             "supervisor":NumberInt("11111")
+...         } }
+...         ],
+...                         "has":[ {"deptLocation":{
+...                                                 "address":"CBD NSW"
+... 
+...                         } },
+...                                 {"deptLocation":{
+...                                 "address":"Baker Street"
+...                                 } }
+...                         ]
+... 
+...         }
+...         } );
+WriteResult({
+	"nInserted" : 0,
+	"writeError" : {
+		"code" : 121,
+		"errmsg" : "Document failed validation"
+	}
+})
+> 
+> 
+> 
+> 
+> print("employee number is in string, while integer is required")
+employee number is in string, while integer is required
+

@@ -1,0 +1,143 @@
+SQL> SET FEEDBACK ON
+SQL> SET LINESIZE 100
+SQL> SET PAGESIZE 200
+SQL> 
+SQL> 
+SQL> 
+SQL> ALTER TABLE DEPARTMENT ADD total_emp VARCHAR(20) NULL;
+
+Table DEPARTMENT altered.
+
+SQL> 
+SQL> ALTER TABLE DEPARTMENT
+  2      ADD CONSTRAINT emp_count CHECK (total_emp >= 0);
+
+Table DEPARTMENT altered.
+
+SQL> 
+SQL> 
+SQL> /* ALTER TABLE DEPARTMENT DROP COLUMN emp_count; */
+SQL> 
+SQL> UPDATE DEPARTMENT 
+  2    set total_emp = 
+  3      (select count(DName)
+  4      from employee 
+  5      WHERE DEPARTMENT.DName = employee.DName 
+  6      group by DName);
+
+1 row updated.
+
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> CREATE OR REPLACE PROCEDURE INSERT_employee ( emp#       IN char,                                                   
+  2                                                emp_name       IN VARCHAR,  
+  3                                                date_of_birth    IN date, 
+  4                                                sup#       IN CHAR,
+  5                                                dept_name     IN VARCHAR) IS 
+  6                                                
+  7   BEGIN 
+  8  
+  9  
+ 10   INSERT INTO employee VALUES( emp#, emp_name, date_of_birth, sup#, dept_name);
+ 11  
+ 12   UPDATE department 
+ 13   SET total_emp = total_emp + 1
+ 14   WHERE DName = dept_name;
+ 15  
+ 16   EXCEPTION 
+ 17       WHEN no_data_found THEN
+ 18          dbms_output.put_line('no data inserted');
+ 19      WHEN OTHERS THEN 
+ 20          dbms_output.put_line(SQLERRM);
+ 21  
+ 22   COMMIT; 
+ 23  
+ 24  
+ 25   END INSERT_employee;
+ 26  /
+
+Procedure INSERT_EMPLOYEE compiled
+
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> CREATE OR REPLACE PROCEDURE DELETE_emp ( emp#       IN char,                                                   
+  2                                                emp_name       IN VARCHAR,  
+  3                                                date_of_birth    IN date, 
+  4                                                sup#       IN CHAR,
+  5                                                dept_name     IN VARCHAR) IS 
+  6                                                
+  7   BEGIN 
+  8  
+  9  
+ 10  
+ 11  DELETE FROM EMPLOYEE WHERE E# = emp#;
+ 12  
+ 13   UPDATE department 
+ 14   SET total_emp = total_emp - 1
+ 15   WHERE DName = dept_name;
+ 16  
+ 17   EXCEPTION 
+ 18       WHEN no_data_found THEN
+ 19          dbms_output.put_line('no data inserted');
+ 20      WHEN OTHERS THEN 
+ 21          dbms_output.put_line(SQLERRM);
+ 22  
+ 23   COMMIT; 
+ 24  
+ 25  
+ 26   END DELETE_emp;
+ 27  /
+
+Procedure DELETE_EMP compiled
+
+SQL> 
+SQL> 
+SQL> select * from DEPARTMENT;
+
+DNAME                          MANAGER                        MSDATE    TOTAL_EMP           
+------------------------------ ------------------------------ --------- --------------------
+Engineering                    Mehrin                         13/JAN/80 2                   
+
+1 row selected. 
+
+SQL> 
+SQL> 
+SQL> 
+SQL> EXECUTE INSERT_employee(12345, 'Mosammat', TO_DATE('1959-01-13','YYYY-MM-DD'), 22222, 'Engineering');
+
+PL/SQL procedure successfully completed.
+
+SQL> 
+SQL> select * from DEPARTMENT;
+
+DNAME                          MANAGER                        MSDATE    TOTAL_EMP           
+------------------------------ ------------------------------ --------- --------------------
+Engineering                    Mehrin                         13/JAN/80 3                   
+
+1 row selected. 
+
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> 
+SQL> EXECUTE DELETE_emp(12345, 'Mosammat', TO_DATE('1959-01-13','YYYY-MM-DD'), 22222, 'Engineering');
+
+PL/SQL procedure successfully completed.
+
+SQL> 
+SQL> select * from DEPARTMENT;
+
+DNAME                          MANAGER                        MSDATE    TOTAL_EMP           
+------------------------------ ------------------------------ --------- --------------------
+Engineering                    Mehrin                         13/JAN/80 2                   
+
+1 row selected. 
+
+SQL> 
+SQL> SPOOL OFF
